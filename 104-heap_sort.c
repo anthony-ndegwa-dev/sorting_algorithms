@@ -1,87 +1,70 @@
 #include "sort.h"
-#include <stdio.h>
 
 /**
- * swap_nums - swaps numbers
- *
- * @arr: input array
- * @a: first index
- * @b: second index
- * Return: no return
+ * swap_ints - Swap two integers in an array.
+ * @a: The first integer to swap.
+ * @b: The second integer to swap.
  */
 
-void swap_nums(int *arr, int a, int b)
+void swap_ints(int *a, int *b)
 {
-	arr[a] = arr[a] + arr[b];
-	arr[b] = arr[a] - arr[b];
-	arr[a] = arr[a] - arr[b];
+	int tmp;
+
+	tmp = *a;
+	*a = *b;
+	*b = tmp;
 }
 
 /**
- * recursion_heap - builds the max heap tree
- *
- * @arr: input array
- * @i: index number
- * @size: size of the array
- * @limit: limit of the array
- * Return: no return
+ * max_heapify - Turn binary tree into a complete binary heap.
+ * @array: An array of integers representing a binary tree.
+ * @size: The size of the array/tree.
+ * @base: The index of the base row of the tree.
+ * @root: The root node of the binary tree.
  */
 
-void recursion_heap(int *arr, int i, size_t size, int limit)
+void max_heapify(int *array, size_t size, size_t base, size_t root)
 {
-	int bigger;
-	int i2;
+	size_t left, right, large;
 
-	i2 = i * 2;
+	left = 2 * root + 1;
+	right = 2 * root + 2;
+	large = root;
 
-	if (i2 + 2 < limit)
+	if (left < base && array[left] > array[large])
+		large = left;
+	if (right < base && array[right] > array[large])
+		large = right;
+
+	if (large != root)
 	{
-		recursion_heap(arr, i2 + 1, size, limit);
-		recursion_heap(arr, i2 + 2, size, limit);
-	}
-
-	if (i2 + 1 >= limit)
-		return;
-
-	if (i2 + 2 < limit)
-		bigger = (arr[i2 + 1] > arr[i2 + 2]) ? (i2 + 1) : (i2 + 2);
-	else
-		bigger = i2 + 1;
-
-	if (arr[i] < arr[bigger])
-	{
-		swap_nums(arr, i, bigger);
-		print_array(arr, size);
-		recursion_heap(arr, bigger, size, limit);
+		swap_ints(array + root, array + large);
+		print_array(array, size);
+		max_heapify(array, size, base, large);
 	}
 }
 
 /**
- * heap_sort - sort an array of integers in ascending order
- * using the Heap sort algorithm
- * @array: input array
- * @size: size of the array
+ * heap_sort - Sort an array of integers in ascending
+ * order using the heap sort algorithm.
+ * @array: An array of integers.
+ * @size: The size of the array.
  */
 
 void heap_sort(int *array, size_t size)
 {
 	int i;
-	size_t limit;
 
-	if (!array || size == 0)
+	if (array == NULL || size < 2)
 		return;
 
-	i = 0;
-	limit = size;
+	for (i = (size / 2) - 1; i >= 0; i--)
+		max_heapify(array, size, size, i);
 
-	while (limit > 1)
+	for (i = size - 1; i > 0; i--)
 	{
-		recursion_heap(array, i, size, limit);
-		if (array[i] >= array[limit - 1])
-		{
-			swap_nums(array, i, limit - 1);
-			print_array(array, size);
-		}
-		limit--;
+		swap_ints(array, array + i);
+		print_array(array, size);
+		max_heapify(array, size, i, 0);
 	}
 }
